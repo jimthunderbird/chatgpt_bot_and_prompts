@@ -1,0 +1,5 @@
+show me a javascript example of express server serving port 9000
+do not explain
+just show me the code, nothing else
+and only show the code inside the codeblock as plaintext
+export the code as plaintext without any formating

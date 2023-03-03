@@ -1,0 +1,62 @@
+refact the following code
+
+```
+const repl = require('node:repl');
+require('dotenv').config();
+
+import process from 'node:process';
+import fs from 'fs';
+import { ChatGPTAPI } from 'chatgpt';
+
+if (process.argv.length <=2) {
+  console.log("please provide a name of the prompt template");
+  process.exit(1);
+}
+
+const promptTemplate = process.argv[2];
+
+const promptTemplateContent = fs.readFileSync(promptTemplate).toString();
+
+const api = new ChatGPTAPI({
+  apiKey: process.env.OPENAI_API_KEY,
+  completionParams: {
+    model: "gpt-3.5-turbo",
+    temperature: 0.5,
+    top_p: 0.8
+  }
+});
+
+let res, messageToChatGPT, parentMessageId;
+
+messageToChatGPT = promptTemplateContent;
+
+(async() => {
+  let buffer = "";
+  res = await api.sendMessage(messageToChatGPT, {
+    parentMessageId,
+    onProgress: (partialResponse) => { 
+      const bufferDiff = partialResponse.text.substr(buffer.length);
+      buffer = partialResponse.text;
+      process.stdout.write(bufferDiff);
+    }
+  });
+  process.stdout.write("\n");
+  parentMessageId = res.id;
+})();
+
+process.stdin.on('data', async (data) => {
+  let messageToChatGPT = data.toString().trim();
+  //try to get the parent message id:
+  let buffer = "";
+  res = await api.sendMessage(messageToChatGPT, {
+    parentMessageId,
+    onProgress: (partialResponse) => { 
+      const bufferDiff = partialResponse.text.substr(buffer.length);
+      buffer = partialResponse.text;
+      process.stdout.write(bufferDiff);
+    }
+  });
+  process.stdout.write("\n");
+  parentMessageId = res.id;
+});
+```
