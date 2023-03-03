@@ -49,17 +49,12 @@ class ChatGPTClient {
   }
 }
 
-if (process.argv.length <= 2) {
-  console.log("Please provide a name of the prompt template");
-  process.exit(1);
-}
-
 const apiKey = process.env.OPENAI_API_KEY;
 const model = "gpt-3.5-turbo";
 const temperature = 0.5;
 const top_p = 0.8;
 
-const client = new ChatGPTClient(process.argv[2], apiKey, model, temperature, top_p);
+const client = new ChatGPTClient(process.argv[2] || 'promps/default.txt', apiKey, model, temperature, top_p);
 client.init();
 
 process.stdin.on('data', client.handleInput.bind(client));
