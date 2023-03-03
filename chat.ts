@@ -22,6 +22,8 @@ class ChatGPTClient {
     const promptTemplateContent = await fs.readFile(this.promptTemplate, 'utf-8');
     let messageToChatGPT = promptTemplateContent;
 
+    process.stdin.on('data', this.handleInput.bind(this));
+
     await this.sendMessage(messageToChatGPT);
   }
 
@@ -56,5 +58,3 @@ const top_p = 0.8;
 
 const client = new ChatGPTClient(process.argv[2] || 'promps/default.txt', apiKey, model, temperature, top_p);
 client.init();
-
-process.stdin.on('data', client.handleInput.bind(client));
